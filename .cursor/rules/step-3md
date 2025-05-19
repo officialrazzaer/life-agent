@@ -1,0 +1,80 @@
+##`Step 3: Vector Database Setup
+
+## For semantic memory and similarity search capabilities, set up a vector database. You can choose between Chroma (easier to self-host) or Qdrant (more scalable):
+
+
+##```python
+# src/db/vector_store.py
+##`import chromadb
+##`from chromadb.config import Settings
+
+class ChromaDBManager:
+    def __init__(self, persist_directory="./chroma_db"):
+      ##`  self.client = chromadb.Client(Settings(
+            persist_directory=persist_directory,
+            anonymized_telemetry=False
+      ##`  ))
+        
+    def create_collection(self, collection_name):
+        return self.client.create_collection(collection_name)
+    
+    def get_collection(self, collection_name):
+        return self.client.get_collection(collection_name)
+    
+    def add_documents(self, collection_name, documents, metadatas, ids):
+        collection = self.get_collection(collection_name)
+        collection.add(
+            documents=documents,
+            metadatas=metadatas,
+            ids=ids
+        )
+    
+    def query_collection(self, collection_name, query_text, n_results=5):
+        collection = self.get_collection(collection_name)
+        results = collection.query(
+            query_texts=[query_text],
+            n_results=n_results
+        )
+        return results
+
+##````python
+# src/db/vector_store.py
+##`from qdrant_client import QdrantClient
+##`from qdrant_client.http import models
+
+class QdrantManager:
+    def __init__(self, url=None, api_key=None):
+        if url and api_key:
+        ##`    self.client = QdrantClient(url=url, api_key=api_key)
+       ##` else:
+          ##`  self.client = QdrantClient(":memory:")
+    
+    ##`def create_collection(self, collection_name, vector_size=1536):
+       ##`lf.client.create_collection(
+            collection_name=collection_name,
+         ##`   vectors_config=models.VectorParams(
+##size=vector_size,
+         ##`       distance=models.Distance.COSINE
+        ##`    )
+     ##`   )
+    
+    def add_documents(self, collection_name, vectors, metadatas, ids):
+       ##` points = [
+       ##`     models.PointStruct(
+                id=id,
+                vector=vector,
+            ##`    payload=metadata
+        ##`    )
+          ##`  for id, vector, metadata in zip(ids, vectors, metadatas)
+      ##`  ]
+       ##` self.client.upsert(
+      ##`      collection_name=collection_name,
+      ##`      points=points
+      ##`  )
+    
+    def query_collection(self, collection_name, query_vector, limit=5):
+        return self.client.search(
+            collection_name=collection_name,
+            query_vector=query_vector,
+            limit=limit
+        )

@@ -1,0 +1,8 @@
+langchain
+openai
+supabase
+chromadb
+qdrant-client
+python-telegram-bot
+pydantic
+python-dotenv 
