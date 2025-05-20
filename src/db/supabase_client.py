@@ -24,4 +24,10 @@ class SupabaseManager:
         return query.execute()
 
     def delete_data(self, table_name, match_column, match_value):
-        return self.supabase.table(table_name).delete().eq(match_column, match_value).execute() 
+        return self.supabase.table(table_name).delete().eq(match_column, match_value).execute()
+
+    def execute_sql(self, sql):
+        """
+        Execute a raw SQL query. Use with caution.
+        """
+        return self.supabase.rpc('execute_sql', {'sql': sql}) 
